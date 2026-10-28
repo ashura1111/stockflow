@@ -1,0 +1,44 @@
+# Dependencies
+frontend/node_modules/
+frontend/dist/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Go build artifacts
+backend/*.exe
+backend/api
+backend/tmp/
+
+# Test and coverage outputs
+coverage/
+coverage.out
+*.test
+*.out
+
+# Logs
+*.log
+
+# IDE and editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local database backups and dumps
+*.dump
+*.bak
+*.sql.gz
+
+# Docker local overrides
+docker-compose.override.yml
+docker-compose.*.override.yml

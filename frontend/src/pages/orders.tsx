@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Eye, Trash2, Plus } from 'lucide-react';
 import { api, ApiError } from '../api/client';
 import type { SalesOrder, CreateOrderRequest, Product } from '../types/index';
@@ -36,12 +36,7 @@ const SalesOrders = () => {
 
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
-  useEffect(() => {
-    fetchOrders();
-    fetchAvailableProducts();
-  }, [page]);
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -57,16 +52,26 @@ const SalesOrders = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, pageSize]);
 
-  const fetchAvailableProducts = async () => {
+  const fetchAvailableProducts = useCallback(async () => {
     try {
       const data = await api.getProducts('', 'active', false, 1, 1000);
       setAvailableProducts(data.data);
     } catch {
       setAvailableProducts([]);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchOrders();
+  }, [fetchOrders]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchAvailableProducts();
+  }, [fetchAvailableProducts]);
 
   const handleOpenCreateModal = () => {
     setCustomerName('');

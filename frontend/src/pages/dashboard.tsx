@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { api, ApiError } from '../api/client';
 import type { DashboardStats } from '../types/index';
 import { formatCurrency, formatRelativeTime } from '../utils/format';
@@ -9,11 +9,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -28,7 +24,12 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchStats();
+  }, [fetchStats]);
 
   if (loading) return <div className="loading">Loading dashboard...</div>;
   if (error) return <div className="error-message">{error}</div>;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { api, ApiError } from '../api/client';
 import type { StockMovement } from '../types/index';
 import { formatRelativeTime, formatDate } from '../utils/format';
@@ -14,11 +14,7 @@ const StockMovements = () => {
   const [total, setTotal] = useState(0);
   const [pageSize] = useState(20);
 
-  useEffect(() => {
-    fetchMovements();
-  }, [search, typeFilter, page]);
-
-  const fetchMovements = async () => {
+  const fetchMovements = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -34,7 +30,12 @@ const StockMovements = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [search, typeFilter, page, pageSize]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchMovements();
+  }, [fetchMovements]);
 
   const totalPages = Math.ceil(total / pageSize);
 

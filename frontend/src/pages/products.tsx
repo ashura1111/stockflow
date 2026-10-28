@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Trash2, Edit, Plus, TrendingDown } from 'lucide-react';
 import { api, ApiError } from '../api/client';
 import type { Product } from '../types/index';
@@ -60,11 +60,7 @@ const Products = () => {
 
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
-  useEffect(() => {
-    fetchProducts();
-  }, [search, statusFilter, lowStockOnly, page]);
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -80,7 +76,12 @@ const Products = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [search, statusFilter, lowStockOnly, page, pageSize]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchProducts();
+  }, [fetchProducts]);
 
   const handleOpenModal = (product?: Product) => {
     if (product) {
@@ -128,8 +129,8 @@ const Products = () => {
         await api.createProduct(formData);
         setToast({ message: 'Product created successfully', type: 'success' });
       } else if (editingProduct) {
-        const { stock, ...updateData } = formData;
-        await api.updateProduct(editingProduct.id, updateData);
+        const updatedFormData = { sku: formData.sku, name: formData.name, price: formData.price, is_active: formData.is_active };
+        await api.updateProduct(editingProduct.id, updatedFormData);
         setToast({ message: 'Product updated successfully', type: 'success' });
       }
       setShowModal(false);

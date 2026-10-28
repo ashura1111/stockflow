@@ -105,33 +105,15 @@ class ApiClient {
     params.append('limit', limit.toString());
     return this.get<StockMovementList>(`/products/${id}/movements?${params}`);
   }
-getMovements(
-  search: string = '',
-  type: string = '',
-  page: number = 1,
-  limit: number = 20
-) {
-  const params = new URLSearchParams();
 
-  if (search) params.append('search', search);
-  if (type) params.append('type', type);
-
-  params.append('page', page.toString());
-  params.append('limit', limit.toString());
-
-  return this.get<StockMovementList>(`/movements?${params}`);
-}
-getMovements(search: string = '', type: string = '', page: number = 1, limit: number = 20) {
-  const params = new URLSearchParams();
-
-  if (search) params.append('search', search);
-  if (type) params.append('type', type);
-
-  params.append('page', page.toString());
-  params.append('limit', limit.toString());
-
-  return this.get<StockMovementList>(`/movements?${params}`);
-}
+  getMovements(search: string = '', type: string = '', page: number = 1, limit: number = 20) {
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    if (type) params.append('type', type);
+    params.append('page', page.toString());
+    params.append('limit', limit.toString());
+    return this.get<StockMovementList>(`/movements?${params}`);
+  }
 
   getOrders(search: string = '', status: string = '', page: number = 1, limit: number = 10) {
     const params = new URLSearchParams();

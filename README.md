@@ -1,512 +1,298 @@
-# StockFlow - Inventory Management System
+# StockFlow
 
-A complete, production-minded full-stack inventory management web application for construction materials and home supplies businesses. Built with Go, React, PostgreSQL, and Docker.
+**Inventory management for construction materials and home supplies**
+**Aplikasi manajemen inventaris untuk bahan bangunan dan perlengkapan rumah**
 
-## Features
+StockFlow is a full-stack demo application for managing products, stock movements, and sales orders. It is built with Go, React, TypeScript, PostgreSQL, and Docker Compose.
 
-- **Product Management**: Create, update, delete products with SKU, pricing, and stock tracking
-- **Stock Movements**: Track all inventory adjustments (stock in/out) with historical records
-- **Sales Orders**: Create customer orders with automatic stock deduction and order cancellation
-- **Dashboard**: Real-time statistics including total products, active products, total stock value, and low-stock alerts
-- **Search & Filtering**: Advanced search by SKU/product name with status and low-stock filters
-- **Pagination**: Efficient data loading with customizable page sizes
-- **Real-time Updates**: All data refreshes after mutations
-- **Error Handling**: Comprehensive validation and user-friendly error messages
-- **Currency Formatting**: All prices displayed in Indonesian Rupiah (IDR)
+StockFlow adalah aplikasi demo full-stack untuk mengelola produk, pergerakan stok, dan pesanan penjualan. Aplikasi ini dibangun menggunakan Go, React, TypeScript, PostgreSQL, dan Docker Compose.
 
-## Technology Stack
+## Features | Fitur
 
-### Backend
-- **Language**: Go 1.22
-- **HTTP Router**: Go standard `net/http` with custom routing
-- **Database**: PostgreSQL 17
-- **Database Driver**: pgx/v5
-- **Validation**: go-playground/validator/v10
+- Product listing, search, filters, pagination, and product maintenance.
+  Daftar produk, pencarian, filter, pagination, serta pengelolaan produk.
+- Stock-in and stock-out adjustments with a movement history.
+  Penyesuaian stok masuk dan keluar beserta riwayat pergerakannya.
+- Sales orders that deduct stock and can be cancelled to restore it.
+  Pesanan penjualan yang mengurangi stok dan dapat dibatalkan untuk mengembalikan stok.
+- Dashboard with stock and order summaries.
+  Dashboard berisi ringkasan stok dan pesanan.
+- PostgreSQL initialization with schema and sample data on first startup.
+  Inisialisasi PostgreSQL dengan skema dan data contoh saat pertama kali dijalankan.
 
-### Frontend
-- **Framework**: React 19 with TypeScript
-- **Build Tool**: Vite
-- **Routing**: React Router v6
-- **Icons**: Lucide React
-- **Styling**: Tailwind-inspired CSS
+## Technology Stack | Teknologi
 
-### Infrastructure
-- **Containerization**: Docker
-- **Orchestration**: Docker Compose
-- **Database Volume**: Persistent PostgreSQL data
+| Area | Technology |
+|---|---|
+| Backend | Go 1.27+, standard-library `net/http`, pgx/v5 |
+| Frontend | React 19, TypeScript, Vite |
+| Database | PostgreSQL 17 |
+| Local orchestration | Docker Compose |
 
-## Project Structure
+## Project Structure | Struktur Proyek
 
-```
+```text
 stockflow/
-├── backend/
-│   ├── cmd/api/
-│   │   └── main.go                 # Application entry point
-│   ├── internal/
-│   │   ├── config/                 # Configuration management
-│   │   ├── database/               # Database connection
-│   │   ├── handlers/               # HTTP handlers
-│   │   ├── middleware/             # HTTP middleware
-│   │   ├── models/                 # Data models
-│   │   ├── repositories/           # Data access layer
-│   │   ├── services/               # Business logic
-│   │   └── validation/             # Input validation
-│   ├── migrations/                 # SQL migrations
-│   ├── go.mod, go.sum             # Dependencies
-│   └── Dockerfile
-├── frontend/
-│   ├── src/
-│   │   ├── api/                    # API client
-│   │   ├── components/             # Reusable components
-│   │   ├── pages/                  # Page components
-│   │   ├── types/                  # TypeScript types
-│   │   ├── utils/                  # Utility functions
-│   │   ├── App.tsx, main.tsx       # Application entry
-│   │   ├── App.css, index.css      # Styling
-│   ├── index.html, vite.config.ts
-│   ├── package.json
-│   └── Dockerfile
-├── docker-compose.yml              # Service orchestration
-└── README.md
+â”œâ”€â”€ backend/
+â”‚   â”œâ”€â”€ cmd/api/              # API entry point
+â”‚   â”œâ”€â”€ internal/             # Config, database, handlers, models, repositories, services
+â”‚   â”œâ”€â”€ migrations/           # SQL schema and seed scripts
+â”‚   â”œâ”€â”€ Dockerfile
+â”‚   â””â”€â”€ go.mod
+â”œâ”€â”€ frontend/
+â”‚   â”œâ”€â”€ src/                  # React application
+â”‚   â”œâ”€â”€ Dockerfile
+â”‚   â””â”€â”€ package.json
+â”œâ”€â”€ docker-compose.yml
+â””â”€â”€ README.md
 ```
 
-## Prerequisites
+## Requirements | Prasyarat
 
-- Docker and Docker Compose (for containerized setup)
-- Node.js 20+ (for frontend development)
-- Go 1.22+ (for backend development)
-- PostgreSQL 17+ (for local development without Docker)
+### Docker Compose (recommended | disarankan)
 
-## Quick Start with Docker Compose
+- Docker Desktop with Docker Compose v2.
+- Ports `5173`, `8080`, and `5434` available on the host.
 
-This is the recommended way to run the complete stack.
+### Running services locally | Menjalankan service secara lokal
 
-```bash
+- Go 1.27 or newer.
+- Node.js 20 or newer and npm.
+- Docker, for running the PostgreSQL service.
+
+## Run with Docker Compose | Menjalankan dengan Docker Compose
+
+From the project root, build and start the application:
+
+Dari root proyek, build dan jalankan aplikasi:
+
+```powershell
 cd C:\stockflow
 docker compose up --build
 ```
 
-The application will be available at:
-- **Frontend**: http://localhost:5173
-- **Backend API**: http://localhost:8080
-- **PostgreSQL**: localhost:5432
-- **Health Check**: http://localhost:8080/api/health
+Wait until PostgreSQL reports healthy and the backend starts. Open:
 
-The database will automatically initialize with schema and seed data on first run.
+Tunggu sampai PostgreSQL berstatus healthy dan backend berjalan. Buka:
 
-## Local Development Setup
+- Frontend: <http://localhost:5173>
+- Backend health check: <http://localhost:8080/api/health>
+- PostgreSQL from the host: `localhost:5434` (inside Compose, the port is `5432`)
 
-### Prerequisites
+The Compose setup mounts `backend/migrations` into PostgreSQL's initialization directory. PostgreSQL runs `001_init.sql` and then `002_seed.sql` **only when the database volume is initialized for the first time**. The named volume `stockflow_data` preserves data across restarts.
 
-Ensure you have Docker and Node.js installed.
+Konfigurasi Compose memasang `backend/migrations` ke direktori inisialisasi PostgreSQL. PostgreSQL menjalankan `001_init.sql` lalu `002_seed.sql` **hanya ketika volume database pertama kali dibuat**. Named volume `stockflow_data` menyimpan data saat container dimulai ulang.
 
-### 1. Start PostgreSQL
+To stop the services, press `Ctrl+C`, or run `docker compose down` in another terminal. `docker compose down` keeps the database volume. Removing the volume also deletes its database data; only do so when you intend to reset the local database.
 
-```bash
-docker run -d \
-  --name stockflow-postgres \
-  -e POSTGRES_DB=stockflow \
-  -e POSTGRES_USER=stockflow \
-  -e POSTGRES_PASSWORD=stockflow_dev_password \
-  -p 5432:5432 \
-  -v stockflow_data:/var/lib/postgresql/data \
-  -v "$(pwd)/backend/migrations:/docker-entrypoint-initdb.d:ro" \
-  postgres:17
+Untuk menghentikan service, tekan `Ctrl+C` atau jalankan `docker compose down` dari terminal lain. Perintah tersebut tidak menghapus volume database. Menghapus volume juga akan menghapus data database lokal; lakukan hanya jika memang ingin mereset database.
+
+## Run Locally | Menjalankan Secara Lokal
+
+Use this option when you want hot reload for the frontend and run the Go API directly on the host. PostgreSQL still runs in Docker.
+
+Gunakan opsi ini jika ingin memakai hot reload pada frontend dan menjalankan API Go langsung di host. PostgreSQL tetap dijalankan melalui Docker.
+
+### 1. Start PostgreSQL | Jalankan PostgreSQL
+
+From the project root:
+
+Dari root proyek:
+
+```powershell
+docker compose up -d postgres
 ```
 
-### 2. Start Backend
+Compose exposes PostgreSQL on host port `5434` and initializes schema and seed data on a fresh volume.
 
-```bash
-cd backend
+Compose membuka PostgreSQL pada port host `5434` serta menginisialisasi skema dan data contoh jika volume masih baru.
+
+### 2. Start the backend | Jalankan backend
+
+In a PowerShell terminal, configure the database port to match the Compose host mapping, then start the API:
+
+Di terminal PowerShell, atur port database agar sesuai dengan pemetaan port Compose, lalu jalankan API:
+
+```powershell
+$env:DB_PORT = "5434"
+cd C:\stockflow\backend
 go run ./cmd/api
 ```
 
-Backend runs on http://localhost:8080
+The API listens on <http://localhost:8080>. The backend reads `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, and `SERVER_PORT`; development defaults are documented in `backend/.env.example`. The application does not automatically load a `.env` file, so set environment variables in the shell before starting it.
 
-### 3. Start Frontend
+API berjalan di <http://localhost:8080>. Backend membaca `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, dan `SERVER_PORT`; nilai default development tersedia di `backend/.env.example`. Aplikasi tidak memuat file `.env` secara otomatis, jadi atur environment variable di shell sebelum menjalankannya.
 
-In a new terminal:
+### 3. Start the frontend | Jalankan frontend
 
-```bash
-cd frontend
+In a second terminal:
+
+Di terminal kedua:
+
+```powershell
+cd C:\stockflow\frontend
 npm install --legacy-peer-deps
 npm run dev
 ```
 
-Frontend runs on http://localhost:5173
+Open <http://localhost:5173>. Vite proxies `/api` requests to `http://localhost:8080`.
 
-The Vite dev server proxies `/api/*` requests to `http://localhost:8080/api/*`.
+Buka <http://localhost:5173>. Vite meneruskan request `/api` ke `http://localhost:8080`.
 
-## Database Schema
+## API Reference and cURL Examples | Referensi API dan Contoh cURL
 
-### Products
-```sql
-CREATE TABLE products (
-    id SERIAL PRIMARY KEY,
-    sku TEXT NOT NULL UNIQUE,
-    name TEXT NOT NULL,
-    price INTEGER NOT NULL CHECK (price >= 0),
-    stock INTEGER NOT NULL DEFAULT 0 CHECK (stock >= 0),
-    is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
+The examples below use `curl.exe`, which avoids PowerShell's `curl` alias. Run them in PowerShell after starting the backend. Request and response bodies use JSON; prices are integer Indonesian rupiah (IDR).
+
+Contoh berikut menggunakan `curl.exe` agar tidak tertukar dengan alias `curl` di PowerShell. Jalankan setelah backend aktif. Request dan response menggunakan JSON; harga berupa bilangan bulat dalam rupiah (IDR).
+
+### Health and dashboard | Health check dan dashboard
+
+```powershell
+curl.exe http://localhost:8080/api/health
+curl.exe http://localhost:8080/api/dashboard
 ```
 
-### Stock Movements
-```sql
-CREATE TABLE stock_movements (
-    id SERIAL PRIMARY KEY,
-    product_id INTEGER NOT NULL REFERENCES products(id),
-    type TEXT NOT NULL CHECK (type IN ('in', 'out')),
-    qty INTEGER NOT NULL CHECK (qty > 0),
-    note TEXT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
+### List and search products | Daftar dan pencarian produk
+
+```powershell
+curl.exe "http://localhost:8080/api/products?search=keramik&page=1&limit=10&status=active"
+curl.exe "http://localhost:8080/api/products?low_stock=true"
+curl.exe http://localhost:8080/api/products/1
 ```
 
-### Sales Orders
-```sql
-CREATE TABLE sales_orders (
-    id SERIAL PRIMARY KEY,
-    customer TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'CREATED'
-        CHECK (status IN ('CREATED', 'CANCELLED')),
-    total INTEGER NOT NULL CHECK (total >= 0),
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    cancelled_at TIMESTAMPTZ
-);
+Product list query parameters include `search`, `status`, `low_stock`, `page`, and `limit`. Page size is capped at 100.
+
+Parameter query untuk daftar produk mencakup `search`, `status`, `low_stock`, `page`, dan `limit`. Ukuran halaman dibatasi maksimal 100.
+
+### Create a product | Membuat produk
+
+```powershell
+curl.exe -X POST http://localhost:8080/api/products `
+  -H "Content-Type: application/json" `
+  -d '{"sku":"DEMO-001","name":"Demo Tile","price":85000,"stock":20,"is_active":true}'
 ```
 
-### Sales Order Items
-```sql
-CREATE TABLE sales_order_items (
-    id SERIAL PRIMARY KEY,
-    order_id INTEGER NOT NULL REFERENCES sales_orders(id),
-    sku TEXT NOT NULL REFERENCES products(sku),
-    qty INTEGER NOT NULL CHECK (qty > 0),
-    unit_price INTEGER NOT NULL CHECK (unit_price >= 0)
-);
+### Update a product | Memperbarui produk
+
+`PUT` updates product details; stock is adjusted through the stock endpoint instead.
+
+`PUT` memperbarui detail produk; perubahan stok dilakukan melalui endpoint stok.
+
+```powershell
+curl.exe -X PUT http://localhost:8080/api/products/1 `
+  -H "Content-Type: application/json" `
+  -d '{"sku":"CRM-001","name":"Keramik Lantai 40x40 cm","price":90000,"is_active":true}'
 ```
 
-## API Endpoints
+### Adjust stock and view movement history | Menyesuaikan stok dan melihat riwayat
 
-### Health Check
+Use `type: "in"` to add stock or `type: "out"` to remove stock. Quantity must be positive.
 
-```bash
-GET /api/health
+Gunakan `type: "in"` untuk menambah stok atau `type: "out"` untuk mengurangi stok. Jumlah harus positif.
+
+```powershell
+curl.exe -X POST http://localhost:8080/api/products/1/stock `
+  -H "Content-Type: application/json" `
+  -d '{"type":"in","qty":5,"note":"Restock from supplier"}'
+
+curl.exe "http://localhost:8080/api/products/1/movements?page=1&limit=10"
+curl.exe "http://localhost:8080/api/movements?type=in&page=1&limit=20"
 ```
 
-Returns API and database health status.
+### Create, list, and cancel a sales order | Membuat, melihat, dan membatalkan pesanan
 
-### Dashboard
+The order endpoint calculates line totals from the current product prices. Products must be active and have sufficient stock.
 
-```bash
-GET /api/dashboard
+Endpoint pesanan menghitung subtotal berdasarkan harga produk saat ini. Produk harus aktif dan stok harus mencukupi.
+
+```powershell
+curl.exe -X POST http://localhost:8080/api/orders `
+  -H "Content-Type: application/json" `
+  -d '{"customer":"PT Example","items":[{"sku":"CRM-001","qty":2},{"sku":"SAN-003","qty":1}]}'
+
+curl.exe "http://localhost:8080/api/orders?search=Example&page=1&limit=10"
+curl.exe http://localhost:8080/api/orders/1
+curl.exe -X POST http://localhost:8080/api/orders/1/cancel
 ```
 
-Returns summary statistics and recent activity.
+Use the order `id` returned by the create/list response in place of `1` when retrieving or cancelling a specific order. Cancellation restores the ordered quantities to stock and records stock movements.
 
-### Products
+Gunakan `id` pesanan dari response create/list sebagai pengganti `1` saat melihat atau membatalkan pesanan. Pembatalan mengembalikan jumlah barang ke stok dan mencatat pergerakan stok.
 
-```bash
-# List products (with search, filtering, pagination)
-GET /api/products?search=keramik&page=1&limit=10&status=active&low_stock=true
+### Endpoint summary | Ringkasan endpoint
 
-# Get single product
-GET /api/products/{id}
+| Method | Path | Purpose |
+|---|---|---|
+| `GET` | `/api/health` | Health check, including database connectivity |
+| `GET` | `/api/dashboard` | Dashboard statistics and recent activity |
+| `GET` | `/api/products` | List and filter products |
+| `GET` | `/api/products/{id}` | Get a product |
+| `POST` | `/api/products` | Create a product |
+| `PUT` | `/api/products/{id}` | Update product details |
+| `DELETE` | `/api/products/{id}` | Delete a product when allowed |
+| `POST` | `/api/products/{id}/stock` | Adjust product stock |
+| `GET` | `/api/products/{id}/movements` | List movements for a product |
+| `GET` | `/api/movements` | List and filter all movements |
+| `GET` | `/api/orders` | List and filter sales orders |
+| `GET` | `/api/orders/{id}` | Get a sales order |
+| `POST` | `/api/orders` | Create a sales order |
+| `POST` | `/api/orders/{id}/cancel` | Cancel an order and restore stock |
 
-# Create product
-POST /api/products
-{
-  "sku": "CRM-100",
-  "name": "Product Name",
-  "price": 100000,
-  "stock": 20,
-  "is_active": true
-}
+## Design Decisions | Keputusan Desain
 
-# Update product
-PUT /api/products/{id}
-{
-  "sku": "CRM-100",
-  "name": "Updated Name",
-  "price": 120000,
-  "is_active": true
-}
+- **Go standard-library HTTP routing.** The API uses `net/http`'s `ServeMux`, keeping routing dependencies small and relying on Go's built-in method/path patterns.
+  **Routing HTTP standard library Go.** API menggunakan `ServeMux` dari `net/http`, sehingga dependensi routing tetap sederhana dan memanfaatkan pola method/path bawaan Go.
+- **PostgreSQL for relational integrity.** Products, stock movements, order headers, and order items use relational tables, foreign keys, and check constraints.
+  **PostgreSQL untuk integritas relasional.** Produk, pergerakan stok, header pesanan, dan item pesanan menggunakan tabel relasional, foreign key, serta check constraint.
+- **Transactions for stock-changing workflows.** Stock adjustment, order creation, and cancellation group related database writes into transactions. Stock updates also use row locking in the repository.
+  **Transaksi untuk proses yang mengubah stok.** Penyesuaian stok, pembuatan pesanan, dan pembatalan mengelompokkan penulisan database terkait dalam transaksi. Update stok juga menggunakan row lock di repository.
+- **Integer IDR values.** Prices are stored as integers to avoid floating-point rounding for the project's whole-rupiah currency values.
+  **Nilai IDR berupa integer.** Harga disimpan sebagai bilangan bulat untuk menghindari pembulatan floating-point pada nominal rupiah utuh di proyek ini.
+- **Compose-based local setup.** Docker Compose provides a repeatable local database and app environment; PostgreSQL's initialization scripts seed only a new database volume.
+  **Setup lokal berbasis Compose.** Docker Compose menyediakan lingkungan aplikasi dan database lokal yang konsisten; skrip inisialisasi PostgreSQL hanya melakukan seed pada volume database baru.
 
-# Delete product (only if no history)
-DELETE /api/products/{id}
+## Testing and Build | Pengujian dan Build
 
-# Adjust stock
-POST /api/products/{id}/stock
-{
-  "type": "in",
-  "qty": 10,
-  "note": "Restock from supplier"
-}
+Run backend tests:
 
-# Get movement history
-GET /api/products/{id}/movements?page=1&limit=10
-```
+Jalankan test backend:
 
-### Stock Movements
-
-All stock movements are created automatically when products are created with initial stock, or when stock is adjusted through `/products/{id}/stock`.
-
-### Sales Orders
-
-```bash
-# List orders (with search, pagination)
-GET /api/orders?search=customer&page=1&limit=10
-
-# Get single order
-GET /api/orders/{id}
-
-# Create order
-POST /api/orders
-{
-  "customer": "PT Example Company",
-  "items": [
-    { "sku": "CRM-001", "qty": 3 },
-    { "sku": "SAN-003", "qty": 2 }
-  ]
-}
-
-# Cancel order (restores stock)
-POST /api/orders/{id}/cancel
-```
-
-## API Error Handling
-
-All errors follow a consistent JSON structure:
-
-```json
-{
-  "error": {
-    "code": "INSUFFICIENT_STOCK",
-    "message": "Insufficient stock for the requested operation.",
-    "sku": "CRM-001",
-    "available": 2
-  }
-}
-```
-
-Common error codes:
-- `VALIDATION_ERROR`: Invalid request data
-- `SKU_ALREADY_EXISTS`: Duplicate SKU
-- `PRODUCT_HAS_HISTORY`: Cannot delete product with history
-- `INSUFFICIENT_STOCK`: Not enough stock available
-- `NOT_FOUND`: Resource not found
-- `ALREADY_CANCELLED`: Order already cancelled
-- `INTERNAL_ERROR`: Server error
-
-## Seed Data
-
-The database is automatically seeded with 12 realistic construction and home supply products:
-
-| SKU | Product | Price (IDR) | Initial Stock |
-|---|---|---:|---:|
-| CRM-001 | Keramik Lantai 40x40 cm | 85,000 | 120 |
-| CRM-002 | Keramik Lantai 60x60 cm | 145,000 | 75 |
-| CRM-003 | Keramik Dinding 25x40 cm | 95,000 | 60 |
-| CRM-004 | Granit Tile 60x60 cm | 185,000 | 45 |
-| CRM-005 | Granit Tile 80x80 cm | 275,000 | 30 |
-| CRM-006 | Perekat Keramik 25 kg | 75,000 | 50 |
-| CRM-007 | Nat Keramik 1 kg | 18,000 | 80 |
-| SAN-001 | Kloset Duduk | 1,250,000 | 12 |
-| SAN-002 | Wastafel Keramik | 675,000 | 15 |
-| SAN-003 | Keran Air Stainless | 185,000 | 25 |
-| SAN-004 | Shower Set Kamar Mandi | 450,000 | 0 |
-| HOM-001 | Kitchen Sink Stainless | 550,000 | 10 |
-
-Note: SAN-004 is inactive, and multiple products have stock ≤ 10 for demonstration.
-
-## Testing
-
-### Backend Tests
-
-```bash
-cd backend
+```powershell
+cd C:\stockflow\backend
 go test ./...
 ```
 
-Tests cover:
-- Product validation and creation
-- Stock adjustment (in/out)
-- Stock insufficiency detection
-- Sales order creation with concurrent safety
-- Order cancellation and stock restoration
-- Transaction integrity
+Run frontend tests once, then build:
 
-### Frontend Tests
+Jalankan test frontend sekali, lalu build:
 
-```bash
-cd frontend
-npm run test
-```
-
-Tests cover:
-- Form validation
-- Number formatting
-- Relative time formatting
-- Component rendering
-
-### Build Verification
-
-```bash
-cd frontend
+```powershell
+cd C:\stockflow\frontend
+npm run test -- --run
 npm run build
-
-cd backend
-go build ./cmd/api
 ```
 
-## Backend Validation and Transaction Safety
+The frontend test command uses Vitest; `--run` makes it exit after the test run instead of staying in watch mode.
 
-The application ensures data integrity through:
+Perintah test frontend menggunakan Vitest; `--run` membuat proses selesai setelah pengujian, bukan tetap berjalan dalam mode watch.
 
-1. **Database Constraints**: Foreign keys, check constraints, unique constraints
-2. **Transaction Isolation**: ACID compliance for multi-step operations
-3. **Row Locking**: Pessimistic locking for stock updates to prevent race conditions
-4. **Validation**: Input validation on all endpoints
-5. **Error Handling**: Comprehensive error responses with actionable information
+## Known Limitations and What I Would Improve | Batasan dan Rencana Perbaikan
 
-### Stock Adjustment Safety
+This is a demo application, not a production-ready inventory platform. It currently has no authentication or authorization, and it has no customer/supplier management, purchase-order workflow, or multi-warehouse support.
 
-Stock adjustments use PostgreSQL transactions with row locking:
+Ini adalah aplikasi demo, bukan platform inventaris siap produksi. Saat ini belum ada autentikasi maupun otorisasi, serta belum tersedia pengelolaan pelanggan/pemasok, alur purchase order, atau dukungan multi-gudang.
 
-```go
-// Atomically check and update stock
-UPDATE products
-SET stock = stock + $1
-WHERE id = $2 AND stock + $1 >= 0;
-```
+If I continued development, I would prioritize:
 
-This prevents overselling even under concurrent requests.
+Jika pengembangan dilanjutkan, prioritas saya adalah:
 
-### Order Creation Safety
-
-Order creation is atomic:
-1. Validate all items exist and are active
-2. Lock product rows in deterministic order
-3. Check stock for each item
-4. Create order header
-5. Create order items
-6. Decrement product stock
-7. Create movement records
-8. Commit or rollback entire transaction
-
-## Performance Considerations
-
-- **Indexes**: Optimized indexes on SKU, product activity status, timestamps
-- **Pagination**: All list endpoints support configurable pagination (max 100 per page)
-- **Connection Pooling**: PostgreSQL connection pool (5-25 connections)
-- **Lazy Loading**: Dashboard statistics computed on-demand
-- **Caching**: Frontend caches product list during order creation
-
-## Security
-
-- **SQL Injection Prevention**: All queries use parameterized statements
-- **CORS**: Configured to allow frontend origin
-- **Input Validation**: All user inputs validated server-side
-- **No Secrets in Code**: Database credentials via environment variables
-- **No Sensitive Data Leaks**: SQL errors and stack traces not exposed to clients
-
-## Environment Configuration
-
-Backend configuration via environment variables (defaults provided for development):
-
-```
-DB_HOST=localhost              # PostgreSQL hostname
-DB_PORT=5432                   # PostgreSQL port
-DB_USER=stockflow              # PostgreSQL username
-DB_PASSWORD=stockflow_dev_password  # PostgreSQL password
-DB_NAME=stockflow              # PostgreSQL database name
-SERVER_PORT=8080               # HTTP server port
-```
-
-See `backend/.env.example` for all options.
-
-## Known Limitations
-
-- No authentication or authorization (multi-user support)
-- No audit logging (who/when changes)
-- No role-based access control
-- No customer management (only free-form customer names)
-- No supplier management or purchase orders
-- No inventory forecasting or analytics
-- No barcode scanning
-- No mobile app
-
-## Future Enhancements
-
-- User authentication and RBAC
-- Customer and supplier management
-- Purchase order workflow
-- Inventory aging and expiration tracking
-- Barcode/QR code scanning
-- Advanced reporting and analytics
-- Warehouse location tracking
-- Multi-warehouse support
-- API rate limiting and throttling
-- Search result caching
-- Real-time WebSocket updates
-
-## Troubleshooting
-
-### PostgreSQL Connection Failed
-
-Ensure PostgreSQL is running and accessible:
-
-```bash
-# Check if container is running
-docker ps | grep postgres
-
-# Check logs
-docker logs stockflow-postgres
-
-# Test connection
-psql -h localhost -U stockflow -d stockflow
-```
-
-### Frontend Cannot Connect to Backend
-
-1. Ensure backend is running on port 8080
-2. Check Vite proxy configuration in `vite.config.ts`
-3. Verify no CORS errors in browser console
-4. Check backend logs for connection issues
-
-### Database Already Exists
-
-The migration is idempotent. Seed data uses `ON CONFLICT DO NOTHING` to prevent duplicates. Existing data is preserved.
-
-### Build Failures
-
-```bash
-# Clean and rebuild
-cd frontend && rm -rf node_modules dist && npm install --legacy-peer-deps && npm run build
-
-cd backend && rm main && go clean && go build ./cmd/api
-```
-
-## Contributing
-
-To extend the application:
-
-1. Follow existing code patterns and naming conventions
-2. Add database migrations in `backend/migrations/`
-3. Update API types in `frontend/src/types/`
-4. Add tests for new features
-5. Update README documentation
-
-## License
-
-This is a demonstration project for inventory management systems.
-
-## Support
-
-For issues or questions, refer to:
-- Backend error codes and messages (API responses)
-- Frontend error notifications and validation messages
-- Docker Compose logs (`docker compose logs`)
-- PostgreSQL logs (`docker logs stockflow-postgres`)
+1. **Authentication, authorization, and audit history** so access and important stock changes can be attributed to users.
+   **Autentikasi, otorisasi, dan audit history** agar akses serta perubahan stok penting dapat ditelusuri ke pengguna.
+2. **Versioned migrations** with a migration runner, rather than relying on PostgreSQL's first-start initialization directory for schema changes.
+   **Migration berversi** dengan migration runner, bukan mengandalkan direktori inisialisasi PostgreSQL saat pertama kali berjalan untuk perubahan skema.
+3. **More integration and end-to-end tests**, especially for database concurrency, rollback behavior, and the main UI workflows.
+   **Lebih banyak integration dan end-to-end test**, terutama untuk konkurensi database, perilaku rollback, dan alur utama UI.
+4. **Operational hardening**, including production secret management, stricter configuration validation, structured logging, and health/readiness checks.
+   **Penguatan operasional**, termasuk pengelolaan secret untuk production, validasi konfigurasi yang lebih ketat, structured logging, serta health/readiness check.
+5. **Business workflows** for suppliers, purchase orders, and warehouse locations once the core inventory requirements are clear.
+   **Alur bisnis** untuk pemasok, purchase order, dan lokasi gudang setelah kebutuhan inti inventaris ditetapkan.
